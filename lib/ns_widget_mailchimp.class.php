@@ -56,6 +56,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				'title' => $this->default_title,
 				'signup_text' => $this->default_signup_text,
 				'success_message' => $this->default_success_message,
+				'group_subscriptions' => '',
 				'collect_first' => false,
 				'collect_last' => false,
 				'old_markup' => false
@@ -105,6 +106,12 @@ class NS_Widget_MailChimp extends WP_Widget {
 						<label for="<?php echo $this->get_field_id('failure_message'); ?>"><?php echo __('Failure :', 'mailchimp-widget'); ?></label>
 						<textarea class="widefat" id="<?php echo $this->get_field_id('failure_message'); ?>" name="<?php echo $this->get_field_name('failure_message'); ?>"><?php echo $failure_message; ?></textarea>
 					</p>
+					<p>
+						<label for="<?php echo $this->get_field_id('group_subscriptions'); ?>">Group Subscriptions</label>
+						<textarea class="widefat" id="<?php echo $this->get_field_id('group_subscriptions'); ?>" name="<?php echo $this->get_field_name('group_subscriptions'); ?>"><?php echo $group_subscriptions; ?></textarea>
+					</p>
+					<?php if(isset($current_mailing_list)) print_r($mcapi->listInterestGroupings($current_mailing_list)); ?>
+
 			<?php
 			
 		}
@@ -151,6 +158,15 @@ class NS_Widget_MailChimp extends WP_Widget {
 						
 						$merge_vars['LNAME'] = $_GET[$this->id_base . '_last_name'];
 						
+					}
+
+					if(!empty($group_subscriptions)) {
+						$merge_vars['GROUPINGS'] = array(
+							"0" => array(
+								'name' => 'Resources',
+								'groups' => $group_subscriptions
+							)
+						);
 					}
 					
 					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_GET['ns_mc_number']), $_GET[$this->id_base . '_email'], $merge_vars);
@@ -250,6 +266,8 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$instance['success_message'] = esc_attr($new_instance['success_message']);
 		
 		$instance['title'] = esc_attr($new_instance['title']);
+
+		$instance['group_subscriptions'] = esc_attr($new_instance['group_subscriptions']);
 		
 		return $instance;
 		
