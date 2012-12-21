@@ -1577,6 +1577,18 @@ class MCAPI {
         return $this->callServer("listSubscribe", $params);
     }
 
+    // specific to my installation
+    function listSubscribeOrListUpdateMember($id, $email_address, $merge_vars=NULL) {
+        $response = $this->listSubscribe($id, $email_address, $merge_vars);
+
+        if($response == false && $this->errorCode == 214) {
+            // then the person is already subscribed, update them
+            $response = $this->listUpdateMember($id, $email_address, $merge_vars, '', false);
+        }
+
+        return $response;
+    }
+
     /**
      * Unsubscribe the given email address from the list
      *
