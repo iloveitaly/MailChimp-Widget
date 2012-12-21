@@ -3,7 +3,7 @@ Contributors: jameslafferty
 Tags: newsletter, MailChimp, mailing list, widget, email marketing
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JSL4JTA4KMZLG
 Requires at least: 3.0.1
-Tested up to: 3.0.1
+Tested up to: 3.2.1
 Stable tag: trunk
 
 Adds a widget that allows your users to sign up for your MailChimp mailing list.
@@ -40,9 +40,48 @@ Check your PHP version. You need at least PHP 5.1.2 to use this plugin.
 3. The widget displays in your sidebar.
 
 == Changelog ==
+= 0.8.12 =
+* Bugfix to account for multiple failed submissions. Also cleans up the mailchimp-widget.js file. Thank you to verify for pointing out the problem and its solution.
+
+= 0.8.11 =
+* Added Russian translation. Thank you to Игорь Клипач for contributing!
+
+= 0.8.10 =
+* Reintegrated translation, which wasn't getting called before.
+
+= 0.8.9 =
+* Added instance number to id in widget.
+
+= 0.8.8 =
+* Some improvements to the underlying code and markup.
+
+= 0.8.7 =
+* Added German translation. Thank you to Nils Kaiser for this contribution!
+
+= 0.8.6 =
+* Fix for some issues Multisite users were having when trying to add API keys. Thank you to [khungate ](https://github.com/khungate) and [tapuat](https://github.com/tapuat) over at GitHub for finding this and helping me figure out a fix.
+
+= 0.8.5 =
+* This version is broken. Use 0.8.6 instead.
+
+= 0.8.2 =
+* Added Spanish translation. Thank you to [Iván Gabriel Campaña Naranjo](http://icampana.blogspot.com/) for this contribution!
+
+= 0.8.1 =
+* Added Brazilian Portuguese translation. Thank you to Marcelo Vasconcelos Araújo for this contribution!
+
+= 0.8 =
+* Updated to newer version of the MCAPI library. Thanks to [David Cowgill](http://wordpress.org/support/profile/dcowgill) for pointing out that this was needed.
+
+= 0.7.5 =
+* Added notice to folks who don't have cURL installed, to cut down on some source of confusion about whether the plugin works or not.
+
+= 0.7.2 =
+* Adds Dutch language support. Thank you to Angelique Schäffer for this contribution!
+* The French translation seems to have been missing. This actually adds it in again.
 
 = 0.7.1 =
-* Restores the original autoloader.
+* Restores the original autoloader.¨
 
 = 0.7 =
 * Added French language support. Thank you to Frederick Marcoux for this contribution!
@@ -90,8 +129,47 @@ Check your PHP version. You need at least PHP 5.1.2 to use this plugin.
 * First release.
 
 == Upgrade Notice ==
+= 0.8.12 =
+* Bugfix to account for multiple failed submissions. Also cleans up the mailchimp-widget.js file. Thank you to verify for pointing out the problem and its solution.
+
+= 0.8.11 =
+ * Added Russian translation. Thank you to Игорь Клипач for contributing!
+
+= 0.8.10 =
+* If translations are giving you trouble, this should help fix it.
+
+= 0.8.9 =
+* This is an important upgrade from 0.8.8 if you're using multiple widget instances.
+
+= 0.8.8 =
+* Some minor improvements to the underlying markup.
+
+= 0.8.7 =
+* Adds support for German. Thank you to Nils Kaiser for the translation.
+
+= 0.8.6 =
+* Fix for some issues Multisite users were having when trying to add API keys. Thank you to [khungate ](https://github.com/khungate) and [tapuat](https://github.com/tapuat) over at GitHub for finding this and helping me figure out a fix.
+
+= 0.8.5 =
+* This version is broken. Use 0.8.6 instead.
+
+= 0.8.2 =
+* Adds support for Spanish. Thank you to [Iván Gabriel Campaña Naranjo](http://icampana.blogspot.com/) for the translation.
+
+= 0.8.1 =
+* Adds support for Brazilian Portuguese. Thank you to Marcelo Vasconcelos Araújo for the translation.
+
+= 0.8 =
+* Updates the MCAPI Library to the current version. Thanks to [David Cowgill](http://wordpress.org/support/profile/dcowgill) for pointing out that this was needed.
+
+= 0.7.5 =
+* Provides a notice for folks who don't have cURL installed. The notice has not yet been translated.
+
+= 0.7.2 =
+* Fixes the French translation and adds Dutch. Thank you to Angelique Schäffer for the translation.
+
 = 0.7.1 =
-Fixes namespace issue introduced in 0.7.
+* Fixes namespace issue introduced in 0.7.
 
 = 0.7 =
 * Adds French language support. Thank you Frederick Marcoux for the translation.
@@ -137,7 +215,12 @@ Fixes namespace issue introduced in 0.7.
 == Internationalization (i18n) ==
 Currently, translations are included to the following languages:
 
-* da_DK - Danish in Denmark. Thank you to [joynielsen](http://joyfulliving.dk) for contributing!
+* da_DK - Danish. Thank you to [joynielsen](http://joyfulliving.dk) for contributing!
+* de_DE - German. Thank you Nils Kaiser for contributing!
+* es_ES - Spanish. Thank you to [Iván Gabriel Campaña Naranjo](http://icampana.blogspot.com/) for contributing!
 * fr_FR - French. Thank you to Frederick Marcoux for contributing!
+* nl_NL - Dutch. Thank you to Angelique Schäffer for contributing!
+* pt_BR - Portuguese. Thank you to Marcelo Vasconcelos Araújo for contributing!
+* ru_RU - Russian. Thank you to Игорь Клипач for contributing!
 
 If you're interested in doing a translation into your language, please let me know.
