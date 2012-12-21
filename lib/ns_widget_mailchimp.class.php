@@ -153,7 +153,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 						
 					}
 					
-					$subscribed = $mcapi->listSubscribe($this->get_current_mailing_list_id($_GET['ns_mc_number']), $_GET[$this->id_base . '_email'], $merge_vars);
+					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_GET['ns_mc_number']), $_GET[$this->id_base . '_email'], $merge_vars);
 				
 					if (false == $subscribed) {
 						$result['mc_errorcode'] = $mcapi->errorCode;
@@ -204,7 +204,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				
 			}
 			
-			$subscribed = $mcapi->listSubscribe($this->get_current_mailing_list_id($_POST['ns_mc_number']), $_POST[$this->id_base . '_email'], $merge_vars);
+			$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_POST['ns_mc_number']), $_POST[$this->id_base . '_email'], $merge_vars);
 			
 			if (false == $subscribed) {
 
@@ -261,7 +261,6 @@ class NS_Widget_MailChimp extends WP_Widget {
 	 */
 	
 	public function widget ($args, $instance) {
-		echo print_r($args);
 		extract($args);
 		
 		if (false == $this->ns_mc_plugin->get_mcapi()) {
