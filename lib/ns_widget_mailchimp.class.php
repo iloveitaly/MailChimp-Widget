@@ -124,10 +124,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 								echo $group_interests_info["name"]."<br/>";
 							}
 						}
-					}?>
-
-			<?php
-			
+					}
 		}
 	}
 	
@@ -402,7 +399,6 @@ class NS_Widget_MailChimp extends WP_Widget {
 	    $options = get_option($this->option_name);
 	    return $options[$number]['group_name'];
 	}
-
 	
 }
 
