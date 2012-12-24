@@ -110,7 +110,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 						<label for="<?php echo $this->get_field_id('group_subscriptions'); ?>">Group Subscriptions</label>
 						<textarea class="widefat" id="<?php echo $this->get_field_id('group_subscriptions'); ?>" name="<?php echo $this->get_field_name('group_subscriptions'); ?>"><?php echo $group_subscriptions; ?></textarea>
 					</p>
-					<?php if(isset($current_mailing_list)) print_r($mcapi->listInterestGroupings($current_mailing_list)); ?>
+					<?php /* if(isset($current_mailing_list)) print_r($mcapi->listInterestGroupings($current_mailing_list)); */ ?>
 
 			<?php
 			
@@ -160,6 +160,8 @@ class NS_Widget_MailChimp extends WP_Widget {
 						
 					}
 
+					$group_subscriptions = $this->get_group_subscriptions($_GET['ns_mc_number']);
+
 					if(!empty($group_subscriptions)) {
 						$merge_vars['GROUPINGS'] = array(
 							"0" => array(
@@ -168,7 +170,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 							)
 						);
 					}
-					
+
 					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_GET['ns_mc_number']), $_GET[$this->id_base . '_email'], $merge_vars);
 				
 					if (false == $subscribed) {
@@ -373,6 +375,11 @@ class NS_Widget_MailChimp extends WP_Widget {
 		
 		return $options[$number]['success_message'];
 		
+	}
+
+	private function get_group_subscriptions($number = null) {
+		$options = get_option($this->option_name);
+		return $options[$number]['group_subscriptions'];
 	}
 	
 }
