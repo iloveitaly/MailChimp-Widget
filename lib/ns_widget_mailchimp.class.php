@@ -305,12 +305,12 @@ class NS_Widget_MailChimp extends WP_Widget {
 						}
 						if ($instance['collect_last']) {
 					?>	
-					<input placeholder="Last Name" class="input-small" type="text" name="<?php echo $this->id_base . '_last_name'; ?>" /></label>
+					<input placeholder="Last Name" class="input-small" type="text" name="<?php echo $this->id_base . '_last_name'; ?>" />
 					<?php	
 						}
-					?><br/>
+					?>
 						<input type="hidden" name="ns_mc_number" value="<?php echo $this->number; ?>" />
-						<input placeholder="Email Address" id="<?php echo $this->id_base; ?>-email-<?php echo $this->number; ?>" type="text" name="<?php echo $this->id_base; ?>_email" /><br/>
+						<input placeholder="Email Address" id="<?php echo $this->id_base; ?>-email-<?php echo $this->number; ?>" type="text" name="<?php echo $this->id_base; ?>_email" />
 						<input class="btn btn-success" type="submit" name="<?php echo __($instance['signup_text'], 'mailchimp-widget'); ?>" value="<?php echo __($instance['signup_text'], 'mailchimp-widget'); ?>" />
 					</form>
 						<script>jQuery('#<?php echo $this->id_base; ?>_form-<?php echo $this->number; ?>').ns_mc_widget({"url" : "<?php echo $_SERVER['PHP_SELF']; ?>", "cookie_id" : "<?php echo $this->id_base; ?>-<?php echo $this->number; ?>", "cookie_value" : "<?php echo $this->hash_mailing_list_id(); ?>", "loader_graphic" : "<?php echo $this->default_loader_graphic; ?>"}); </script>
