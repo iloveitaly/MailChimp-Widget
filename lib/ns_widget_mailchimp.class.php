@@ -57,6 +57,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				'signup_text' => $this->default_signup_text,
 				'success_message' => $this->default_success_message,
 				'group_subscriptions' => '',
+				'group_name' => '',
 				'collect_first' => false,
 				'collect_last' => false,
 				'old_markup' => false
@@ -107,10 +108,23 @@ class NS_Widget_MailChimp extends WP_Widget {
 						<textarea class="widefat" id="<?php echo $this->get_field_id('failure_message'); ?>" name="<?php echo $this->get_field_name('failure_message'); ?>"><?php echo $failure_message; ?></textarea>
 					</p>
 					<p>
+						<label for="<?php echo $this->get_field_id('group_name'); ?>">Group Name</label>
+						<textarea class="widefat" id="<?php echo $this->get_field_id('group_name'); ?>" name="<?php echo $this->get_field_name('group_name'); ?>"><?php echo $group_name; ?></textarea>
+					</p>
+					<p>
 						<label for="<?php echo $this->get_field_id('group_subscriptions'); ?>">Group Subscriptions</label>
 						<textarea class="widefat" id="<?php echo $this->get_field_id('group_subscriptions'); ?>" name="<?php echo $this->get_field_name('group_subscriptions'); ?>"><?php echo $group_subscriptions; ?></textarea>
 					</p>
-					<?php if(isset($current_mailing_list)) print_r($mcapi->listInterestGroupings($current_mailing_list)); ?>
+					<?php if(isset($current_mailing_list)) {
+						$group_listing = $mcapi->listInterestGroupings($current_mailing_list);
+
+						foreach($group_listing as $key => $group_info) {
+							echo "<b>".$group_info["name"]."</b><br/>";
+							foreach($group_info["groups"] as $group_interests_info) {
+								echo $group_interests_info["name"]."<br/>";
+							}
+						}
+					}?>
 
 			<?php
 			
@@ -163,7 +177,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 					if(!empty($group_subscriptions)) {
 						$merge_vars['GROUPINGS'] = array(
 							"0" => array(
-								'name' => 'Resources',
+								'name' => $group_name,
 								'groups' => $group_subscriptions
 							)
 						);
@@ -267,6 +281,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 		
 		$instance['title'] = esc_attr($new_instance['title']);
 
+		$instance['group_name'] = esc_attr($new_instance['group_name']);
 		$instance['group_subscriptions'] = esc_attr($new_instance['group_subscriptions']);
 		
 		return $instance;
