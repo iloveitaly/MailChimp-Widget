@@ -199,13 +199,12 @@ class NS_Widget_MailChimp extends WP_Widget {
 						$result['success'] = true;
 						$result['error'] = '';
 
-						if($subscribed == 2) {
-							$result['success_message'] =  $this->get_already_subscribed_message($_GET['ns_mc_number']);	
+						if($subscribed === 2) {
+							$result['success_message'] =  $this->get_already_subscribed_message($_GET['ns_mc_number']);
 						} else {
 							$result['success_message'] =  $this->get_success_message($_GET['ns_mc_number']);
 						}
 
-						$result['some_info'] = print_r($subscribed, true);
 						$response = json_encode($result);
 						
 					}
@@ -260,7 +259,11 @@ class NS_Widget_MailChimp extends WP_Widget {
 				
 				$this->successful_signup = true;
 				
-				$this->signup_success_message = '<p>' . $this->get_success_message($_POST['ns_mc_number']) . '</p>';
+				if($subscribed === 2) {
+					$this->signup_success_message = '<p>' . $this->get_already_subscribed_message($_POST['ns_mc_number']) . '</p>';
+				} else {
+					$this->signup_success_message = '<p>' . $this->get_success_message($_POST['ns_mc_number']).'</p>';
+				}
 				
 				return true;
 				
