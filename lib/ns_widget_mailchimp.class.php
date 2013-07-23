@@ -9,6 +9,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 	private $default_loader_graphic = '/wp-content/plugins/mailchimp-widget/images/ajax-loader.gif';
 	private $default_signup_text;
 	private $default_success_message;
+	private $default_already_subscribed_message;
 	private $default_title;
 	private $successful_signup = false;
 	private $subscribe_errors;
@@ -22,6 +23,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$this->default_failure_message = __('There was a problem processing your submission.');
 		$this->default_signup_text = __('Join now!');
 		$this->default_success_message = __('Thank you for joining our mailing list. Please check your email for a confirmation link.');
+		$this->default_already_subscribed_message = __("You are already subscribed. Thank you for joining our list!");
 		$this->default_title = __('Sign up for our mailing list.');
 		$widget_options = array('classname' => 'widget_ns_mailchimp', 'description' => __( "Displays a sign-up form for a MailChimp mailing list.", 'mailchimp-widget'));
 		$this->WP_Widget('ns_widget_mailchimp', __('MailChimp List Signup', 'mailchimp-widget'), $widget_options);
@@ -56,6 +58,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				'title' => $this->default_title,
 				'signup_text' => $this->default_signup_text,
 				'success_message' => $this->default_success_message,
+				'already_subscribed_message' => $this->default_already_subscribed_message,
 				'group_subscriptions' => '',
 				'collect_first' => false,
 				'collect_last' => false,
@@ -101,6 +104,10 @@ class NS_Widget_MailChimp extends WP_Widget {
 					<p>
 						<label for="<?php echo $this->get_field_id('success_message'); ?>"><?php echo __('Success :', 'mailchimp-widget'); ?></label>
 						<textarea class="widefat" id="<?php echo $this->get_field_id('success_message'); ?>" name="<?php echo $this->get_field_name('success_message'); ?>"><?php echo $success_message; ?></textarea>
+					</p>
+					<p>
+						<label for="<?php echo $this->get_field_id('already_subscribed_message'); ?>"><?php echo __('Already Subscribed :', 'mailchimp-widget'); ?></label>
+						<textarea class="widefat" id="<?php echo $this->get_field_id('already_subscribed_message'); ?>" name="<?php echo $this->get_field_name('already_subscribed_message'); ?>"><?php echo $already_subscribed_message; ?></textarea>
 					</p>
 					<p>
 						<label for="<?php echo $this->get_field_id('failure_message'); ?>"><?php echo __('Failure :', 'mailchimp-widget'); ?></label>
@@ -173,15 +180,20 @@ class NS_Widget_MailChimp extends WP_Widget {
 
 					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_GET['ns_mc_number']), $_GET[$this->id_base . '_email'], $merge_vars);
 				
-					if (false == $subscribed) {
+					if ($subscribed == false) {
 						$result['mc_errorcode'] = $mcapi->errorCode;
 						$response = json_encode($result);
-						
 					} else {
-					
 						$result['success'] = true;
 						$result['error'] = '';
-						$result['success_message'] =  $this->get_success_message($_GET['ns_mc_number']);
+
+						if($subscribed == 2) {
+							$result['success_message'] =  $this->get_already_subscribed_message($_GET['ns_mc_number']);	
+						} else {
+							$result['success_message'] =  $this->get_success_message($_GET['ns_mc_number']);
+						}
+
+						$result['some_info'] = print_r($subscribed, true);
 						$response = json_encode($result);
 						
 					}
@@ -266,6 +278,8 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$instance['signup_text'] = esc_attr($new_instance['signup_text']);
 		
 		$instance['success_message'] = esc_attr($new_instance['success_message']);
+
+		$instance['already_subscribed_message'] = esc_attr($new_instance['already_subscribed_message']);
 		
 		$instance['title'] = esc_attr($new_instance['title']);
 
@@ -357,11 +371,8 @@ class NS_Widget_MailChimp extends WP_Widget {
 	 */
 	
 	private function get_failure_message ($number = null) {
-		
 		$options = get_option($this->option_name);
-		
 		return $options[$number]['failure_message'];
-		
 	}
 	
 	/**
@@ -370,11 +381,13 @@ class NS_Widget_MailChimp extends WP_Widget {
 	 */
 	
 	private function get_success_message ($number = null) {
-		
 		$options = get_option($this->option_name);
-		
 		return $options[$number]['success_message'];
-		
+	}
+
+	private function get_already_subscribed_message($number = null) {
+		$options = get_option($this->option_name);
+		return $options[$number]['already_subscribed_message'];		
 	}
 
 	private function get_group_subscriptions($number = null) {
