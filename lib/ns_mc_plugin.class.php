@@ -1,9 +1,5 @@
 <?php
 
-/**
- *
- */
-
 class NS_MC_Plugin {
 	private $options;
 	private static $instance;
@@ -21,7 +17,7 @@ class NS_MC_Plugin {
 		add_action('admin_menu', array(&$this, 'set_up_admin_page'));
 		 // Fetch the options, and, if they haven't been set up yet, display a notice to the user.
 		$this->get_options();
-		if ('' == $this->options) {
+		if ($this->options == '') {
 			add_action('admin_notices', array(&$this, 'admin_notices'));
 		}
 		 // Add our widget when widgets get intialized.

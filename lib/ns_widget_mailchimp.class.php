@@ -30,7 +30,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 		wp_enqueue_script('ns-mc-widget', plugins_url('js/mailchimp-widget-min.js', MAILCHIMP_WIDGET_PATH), array('jquery'), false);
 	}
 	
-	public function form ($instance) {
+	public function form($instance) {
 		$mcapi = $this->ns_mc_plugin->get_mcapi();
 		if ($mcapi == false) {
 			echo $this->ns_mc_plugin->get_admin_notices();
@@ -122,12 +122,16 @@ class NS_Widget_MailChimp extends WP_Widget {
 		if (isset($_GET[$this->id_base . '_email'])) {
 			header("Content-Type: application/json");
 			
-			//Assume the worst.
+			// assume the worst.
 			$response = '';
-			$result = array('success' => false, 'error' => $this->get_failure_message($_GET['ns_mc_number']));
+			$result = array(
+				'success' => false,
+				'error' => $this->get_failure_message($_GET['ns_mc_number'])
+			);
 			
 			$merge_vars = array();
-			if (! is_email($_GET[$this->id_base . '_email'])) { //Use WordPress's built-in is_email function to validate input.
+
+			if (!is_email($_GET[$this->id_base . '_email'])) { //Use WordPress's built-in is_email function to validate input.
 				$response = json_encode($result); //If it's not a valid email address, just encode the defaults.
 			} else {
 				$mcapi = $this->ns_mc_plugin->get_mcapi();
@@ -224,6 +228,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 	
 	public function update($new_instance, $old_instance) {
 		$instance = $old_instance;
+
 		$instance['collect_first'] = !empty($new_instance['collect_first']);
 		$instance['collect_last'] = !empty($new_instance['collect_last']);
 		$instance['current_mailing_list'] = esc_attr($new_instance['current_mailing_list']);
@@ -234,6 +239,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$instance['title'] = esc_attr($new_instance['title']);
 		$instance['group_name'] = esc_attr($new_instance['group_name']);
 		$instance['group_subscriptions'] = esc_attr($new_instance['group_subscriptions']);
+
 		return $instance;
 	}
 	
@@ -256,7 +262,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				if($overridden_template = locate_template( 'templates/mc-widget.php')) {
 					include $overridden_template;
 				} else {
-					include MAILCHIMP_WIDGET_PATH.'templates/widget_template.php';
+					include MAILCHIMP_WIDGET_PATH . 'templates/widget_template.php';
 				}
 			}
 
