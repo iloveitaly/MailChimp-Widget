@@ -27,7 +27,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 	}
 	
 	public function add_scripts () {
-		wp_enqueue_script('ns-mc-widget', plugins_url('js/mailchimp-widget-min.js', MAILCHIMP_WIDGET_PATH), array('jquery'), false);
+		wp_enqueue_script('ns-mc-widget', plugins_url('js/mailchimp-widget-min.js', dirname(__FILE__)), array('jquery'), false);
 	}
 	
 	public function form($instance) {
@@ -124,7 +124,33 @@ class NS_Widget_MailChimp extends WP_Widget {
 		}
 	}
 	
-	public function process_submission () {
+	public function process_submission() {
+		$merge_vars = array();
+
+		// handle optional first & last names
+
+		if(!empty($_REQUEST[$this->id_base . '_first_name']) && is_string($_REQUEST[$this->id_base . '_first_name'])) {
+			$merge_vars['FNAME'] = strip_tags($_REQUEST[$this->id_base . '_first_name']);
+		}
+		
+		if(!empty($_REQUEST[$this->id_base . '_last_name']) && is_string($_REQUEST[$this->id_base . '_last_name'])) {
+			$merge_vars['LNAME'] = strip_tags($_REQUEST[$this->id_base . '_last_name']);
+		}
+
+		// handle group subscriptions
+
+		$group_subscriptions = $this->get_option('group_subscriptions');
+		$group_name = $this->get_option('group_name');
+
+		if(!empty($group_subscriptions)) {
+			$merge_vars['GROUPINGS'] = array(
+				"0" => array(
+					'name' => $group_name,
+					'groups' => $group_subscriptions
+				)
+			);
+		}
+
 		if (isset($_GET[$this->id_base . '_email'])) {
 			header("Content-Type: application/json");
 			
@@ -132,11 +158,9 @@ class NS_Widget_MailChimp extends WP_Widget {
 			$response = '';
 			$result = array(
 				'success' => false,
-				'error' => $this->get_failure_message($_GET['ns_mc_number'])
+				'error' => $this->get_option('failure_message')
 			);
 			
-			$merge_vars = array();
-
 			if (!is_email($_GET[$this->id_base . '_email'])) { //Use WordPress's built-in is_email function to validate input.
 				$response = json_encode($result); //If it's not a valid email address, just encode the defaults.
 			} else {
@@ -145,28 +169,6 @@ class NS_Widget_MailChimp extends WP_Widget {
 				if($this->ns_mc_plugin == false) {
 					$response = json_encode($result);
 				} else {
-					if (isset($_GET[$this->id_base . '_first_name']) && is_string($_GET[$this->id_base . '_first_name'])) {
-						$merge_vars['FNAME'] = $_GET[$this->id_base . '_first_name'];
-					}
-					
-					if (isset($_GET[$this->id_base . '_last_name']) && is_string($_GET[$this->id_base . '_last_name'])) {
-						$merge_vars['LNAME'] = $_GET[$this->id_base . '_last_name'];
-					}
-
-					// handle group subscriptions
-
-					$group_subscriptions = $this->get_group_subscriptions($_GET['ns_mc_number']);
-					$group_name = $this->get_group_name($_GET['ns_mc_number']);
-
-					if(!empty($group_subscriptions)) {
-						$merge_vars['GROUPINGS'] = array(
-							"0" => array(
-								'name' => $group_name,
-								'groups' => $group_subscriptions
-							)
-						);
-					}
-
 					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_GET['ns_mc_number']), $_GET[$this->id_base . '_email'], $merge_vars);
 				
 					if ($subscribed == false) {
@@ -177,9 +179,9 @@ class NS_Widget_MailChimp extends WP_Widget {
 						$result['error'] = '';
 
 						if($subscribed === 2) {
-							$result['success_message'] = $this->get_already_subscribed_message($_GET['ns_mc_number']);
+							$result['success_message'] = $this->get_option('already_subscribed_message');
 						} else {
-							$result['success_message'] = $this->get_success_message($_GET['ns_mc_number']);
+							$result['success_message'] = $this->get_option('success_message');
 						}
 
 						$response = json_encode($result);
@@ -190,7 +192,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 			exit($response);
 			
 		} elseif (isset($_POST[$this->id_base . '_email'])) {
-			$this->subscribe_errors = '<div class="error">'  . $this->get_failure_message($_POST['ns_mc_number']) .  '</div>';
+			$this->subscribe_errors = '<div class="error">'  . $this->get_option('failure_message') .  '</div>';
 
 			if (!is_email($_POST[$this->id_base . '_email'])) {
 				return false;
@@ -200,14 +202,6 @@ class NS_Widget_MailChimp extends WP_Widget {
 			
 			if($mcapi == false) {
 				return false;
-			}
-			
-			if (is_string($_POST[$this->id_base . '_first_name'])  && '' != $_POST[$this->id_base . '_first_name']) {
-				$merge_vars['FNAME'] = strip_tags($_POST[$this->id_base . '_first_name']);
-			}
-			
-			if (is_string($_POST[$this->id_base . '_last_name']) && '' != $_POST[$this->id_base . '_last_name']) {
-				$merge_vars['LNAME'] = strip_tags($_POST[$this->id_base . '_last_name']);
 			}
 			
 			$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_POST['ns_mc_number']), $_POST[$this->id_base . '_email'], $merge_vars);
@@ -222,9 +216,9 @@ class NS_Widget_MailChimp extends WP_Widget {
 				$this->successful_signup = true;
 				
 				if($subscribed === 2) {
-					$this->signup_success_message = '<p>' . $this->get_already_subscribed_message($_POST['ns_mc_number']) . '</p>';
+					$this->signup_success_message = '<p>' . $this->get_option('already_subscribed_message') . '</p>';
 				} else {
-					$this->signup_success_message = '<p>' . $this->get_success_message($_POST['ns_mc_number']).'</p>';
+					$this->signup_success_message = '<p>' . $this->get_option('success_message').'</p>';
 				}
 				
 				return true;
@@ -291,31 +285,6 @@ class NS_Widget_MailChimp extends WP_Widget {
 	private function get_current_mailing_list_id ($number = null) {
 		$options = get_option($this->option_name);
 		return $options[$number]['current_mailing_list'];
-	}
-	
-	private function get_failure_message ($number = null) {
-		$options = get_option($this->option_name);
-		return $options[$number]['failure_message'];
-	}
-	
-	private function get_success_message ($number = null) {
-		$options = get_option($this->option_name);
-		return $options[$number]['success_message'];
-	}
-
-	private function get_already_subscribed_message($number = null) {
-		$options = get_option($this->option_name);
-		return $options[$number]['already_subscribed_message'];		
-	}
-
-	private function get_group_subscriptions($number = null) {
-	    $options = get_option($this->option_name);
-	    return $options[$number]['group_subscriptions'];
-	}
-
-	private function get_group_name($number = null) {
-	  $options = get_option($this->option_name);
-	 	return $options[$number]['group_name'];
 	}
 }
 

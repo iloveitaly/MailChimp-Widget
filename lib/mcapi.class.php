@@ -1582,8 +1582,13 @@ class MCAPI {
         $response = $this->listSubscribe($id, $email_address, $merge_vars);
 
         if($response == false && $this->errorCode == 214) {
-            // then the person is already subscribed, update them
-            $response = $this->listUpdateMember($id, $email_address, $merge_vars, '', false);
+            if(empty($merge_vars)) {
+                // they didn't give us anything to update, simply provide a nice return message
+                $response = 2;
+            } else {
+                // then the person is already subscribed, update them
+                $response = $this->listUpdateMember($id, $email_address, $merge_vars, '', false);
+            }
 
             // indicate that we've updated the record and they already are subscribed
             if($response != false) {
