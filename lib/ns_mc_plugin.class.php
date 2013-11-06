@@ -142,10 +142,6 @@ class NS_MC_Plugin {
 		register_setting( self::$prefix . '_options', self::$prefix . '_options', array($this, 'validate_api_key'));
 	}
 	
-	public function remove_options () {
-		delete_option(self::$prefix . '_options');
-	}
-	
 	public function set_up_admin_page () {
 		add_submenu_page('options-general.php', 'MailChimp Widget Options', 'MailChimp Widget', 'activate_plugins', __FILE__, array(&$this, 'admin_page'));
 	}
