@@ -142,7 +142,7 @@ class NS_MC_Plugin {
 	}
 	
 	public function validate_api_key ($api_key) {
-		//#TODO: Add API validation logic.
+		// TODO: Add API validation logic.
 		return $api_key;
 	}
 	
