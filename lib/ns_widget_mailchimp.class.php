@@ -1,8 +1,4 @@
 <?php
-/**
- * @author James Lafferty
- * @since 0.1
- */
 
 class NS_Widget_MailChimp extends WP_Widget {
 	private $default_failure_message;
@@ -15,10 +11,6 @@ class NS_Widget_MailChimp extends WP_Widget {
 	private $subscribe_errors;
 	private $ns_mc_plugin;
 	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
 	public function NS_Widget_MailChimp () {
 		$this->default_failure_message = __('There was a problem processing your submission.');
 		$this->default_signup_text = __('Join now!');
@@ -29,27 +21,18 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$this->WP_Widget('ns_widget_mailchimp', __('MailChimp List Signup', 'mailchimp-widget'), $widget_options);
 		$this->ns_mc_plugin = NS_MC_Plugin::get_instance();
 		$this->default_loader_graphic = get_bloginfo('wpurl') . $this->default_loader_graphic;
+
 		add_action('init', array(&$this, 'add_scripts'));
 		add_action('parse_request', array(&$this, 'process_submission'));
 	}
 	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
-	
 	public function add_scripts () {
-		wp_enqueue_script('ns-mc-widget', get_bloginfo('wpurl') . '/wp-content/plugins/mailchimp-widget/js/mailchimp-widget-min.js', array('jquery'), false);
+		wp_enqueue_script('ns-mc-widget', plugins_url('js/mailchimp-widget-min.js', MAILCHIMP_WIDGET_PATH), array('jquery'), false);
 	}
-	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
 	
 	public function form ($instance) {
 		$mcapi = $this->ns_mc_plugin->get_mcapi();
-		if (false == $mcapi) {
+		if ($mcapi == false) {
 			echo $this->ns_mc_plugin->get_admin_notices();
 		} else {
 			$this->lists = $mcapi->lists();
@@ -135,15 +118,8 @@ class NS_Widget_MailChimp extends WP_Widget {
 		}
 	}
 	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
-	
 	public function process_submission () {
-		
 		if (isset($_GET[$this->id_base . '_email'])) {
-			
 			header("Content-Type: application/json");
 			
 			//Assume the worst.
@@ -151,32 +127,23 @@ class NS_Widget_MailChimp extends WP_Widget {
 			$result = array('success' => false, 'error' => $this->get_failure_message($_GET['ns_mc_number']));
 			
 			$merge_vars = array();
-			
 			if (! is_email($_GET[$this->id_base . '_email'])) { //Use WordPress's built-in is_email function to validate input.
-				
 				$response = json_encode($result); //If it's not a valid email address, just encode the defaults.
-				
 			} else {
-				
 				$mcapi = $this->ns_mc_plugin->get_mcapi();
-				
-				if (false == $this->ns_mc_plugin) {
-					
+
+				if($this->ns_mc_plugin == false) {
 					$response = json_encode($result);
-					
 				} else {
-					
 					if (isset($_GET[$this->id_base . '_first_name']) && is_string($_GET[$this->id_base . '_first_name'])) {
-						
 						$merge_vars['FNAME'] = $_GET[$this->id_base . '_first_name'];
-						
 					}
 					
 					if (isset($_GET[$this->id_base . '_last_name']) && is_string($_GET[$this->id_base . '_last_name'])) {
-						
 						$merge_vars['LNAME'] = $_GET[$this->id_base . '_last_name'];
-						
 					}
+
+					// handle group subscriptions
 
 					$group_subscriptions = $this->get_group_subscriptions($_GET['ns_mc_number']);
 					$group_name = $this->get_group_name($_GET['ns_mc_number']);
@@ -200,59 +167,44 @@ class NS_Widget_MailChimp extends WP_Widget {
 						$result['error'] = '';
 
 						if($subscribed === 2) {
-							$result['success_message'] =  $this->get_already_subscribed_message($_GET['ns_mc_number']);
+							$result['success_message'] = $this->get_already_subscribed_message($_GET['ns_mc_number']);
 						} else {
-							$result['success_message'] =  $this->get_success_message($_GET['ns_mc_number']);
+							$result['success_message'] = $this->get_success_message($_GET['ns_mc_number']);
 						}
 
 						$response = json_encode($result);
-						
 					}
-					
 				}
-				
 			}
 			
 			exit($response);
 			
 		} elseif (isset($_POST[$this->id_base . '_email'])) {
-			
 			$this->subscribe_errors = '<div class="error">'  . $this->get_failure_message($_POST['ns_mc_number']) .  '</div>';
-			
-			if (! is_email($_POST[$this->id_base . '_email'])) {
-				
+
+			if (!is_email($_POST[$this->id_base . '_email'])) {
 				return false;
-				
 			}
 			
 			$mcapi = $this->ns_mc_plugin->get_mcapi();
 			
-			if (false == $mcapi) {
-				
+			if($mcapi == false) {
 				return false;
-				
 			}
 			
 			if (is_string($_POST[$this->id_base . '_first_name'])  && '' != $_POST[$this->id_base . '_first_name']) {
-				
 				$merge_vars['FNAME'] = strip_tags($_POST[$this->id_base . '_first_name']);
-				
 			}
 			
 			if (is_string($_POST[$this->id_base . '_last_name']) && '' != $_POST[$this->id_base . '_last_name']) {
-				
 				$merge_vars['LNAME'] = strip_tags($_POST[$this->id_base . '_last_name']);
-				
 			}
 			
 			$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_POST['ns_mc_number']), $_POST[$this->id_base . '_email'], $merge_vars);
 			
-			if (false == $subscribed) {
-
+			if ($subscribed == false) {
 				return false;
-				
 			} else {
-				
 				$this->subscribe_errors = '';
 				
 				setcookie($this->id_base . '-' . $this->number, $this->hash_mailing_list_id(), time() + 31556926);
@@ -266,62 +218,36 @@ class NS_Widget_MailChimp extends WP_Widget {
 				}
 				
 				return true;
-				
 			}	
-			
 		}
-		
 	}
 	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
-	
-	public function update ($new_instance, $old_instance) {
-		
+	public function update($new_instance, $old_instance) {
 		$instance = $old_instance;
-		
-		$instance['collect_first'] = ! empty($new_instance['collect_first']);
-		
-		$instance['collect_last'] = ! empty($new_instance['collect_last']);
-		
+		$instance['collect_first'] = !empty($new_instance['collect_first']);
+		$instance['collect_last'] = !empty($new_instance['collect_last']);
 		$instance['current_mailing_list'] = esc_attr($new_instance['current_mailing_list']);
-		
 		$instance['failure_message'] = esc_attr($new_instance['failure_message']);
-		
 		$instance['signup_text'] = esc_attr($new_instance['signup_text']);
-		
 		$instance['success_message'] = esc_attr($new_instance['success_message']);
-
 		$instance['already_subscribed_message'] = esc_attr($new_instance['already_subscribed_message']);
-		
 		$instance['title'] = esc_attr($new_instance['title']);
-
 		$instance['group_name'] = esc_attr($new_instance['group_name']);
 		$instance['group_subscriptions'] = esc_attr($new_instance['group_subscriptions']);
-		
 		return $instance;
-		
 	}
 	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
-	
-	public function widget ($args, $instance) {
+	public function widget($args, $instance) {
 		extract($args);
 		
-		if (false == $this->ns_mc_plugin->get_mcapi()) {
-			
+		if ($this->ns_mc_plugin->get_mcapi() == false) {
 			return 0;
-			
 		} else {
-			
 			echo $before_widget;
 
-			if(!empty($instance['title'])) echo $before_title . $instance['title'] . $after_title;
+			if(!empty($instance['title'])) {
+				echo $before_title . $instance['title'] . $after_title;
+			}
 			
 			if ($this->successful_signup) {
 				echo $this->signup_success_message;
@@ -350,51 +276,23 @@ class NS_Widget_MailChimp extends WP_Widget {
 			}
 			echo $after_widget;
 		}
-		
 	}
-	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
 	
 	private function hash_mailing_list_id () {
-		
 		$options = get_option($this->option_name);
-		
 		$hash = md5($options[$this->number]['current_mailing_list']);
-		
 		return $hash;
-		
 	}
-	
-	/**
-	 * @author James Lafferty
-	 * @since 0.1
-	 */
 	
 	private function get_current_mailing_list_id ($number = null) {
-		
 		$options = get_option($this->option_name);
-		
 		return $options[$number]['current_mailing_list'];
-		
 	}
-	
-	/**
-	 * @author James Lafferty
-	 * @since 0.5
-	 */
 	
 	private function get_failure_message ($number = null) {
 		$options = get_option($this->option_name);
 		return $options[$number]['failure_message'];
 	}
-	
-	/**
-	 * @author James Lafferty
-	 * @since 0.5
-	 */
 	
 	private function get_success_message ($number = null) {
 		$options = get_option($this->option_name);
