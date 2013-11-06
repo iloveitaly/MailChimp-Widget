@@ -1,5 +1,10 @@
 <?php
 $form_id = $this->id_base . '_form-' . $this->number;
+
+$description = $this->get_option('description');
+if(!empty($description)) {
+	echo "<p>".$this->get_option('description')."</p>";
+}
 ?>
 <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" id="<?php echo $form_id; ?>" method="post">
 	<input type="hidden" name="ns_mc_number" value="<?php echo $this->number; ?>" />

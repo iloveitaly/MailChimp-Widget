@@ -39,6 +39,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 			$defaults = array(
 				'failure_message' => $this->default_failure_message,
 				'title' => $this->default_title,
+				'description' => '',
 				'signup_text' => $this->default_signup_text,
 				'success_message' => $this->default_success_message,
 				'already_subscribed_message' => $this->default_already_subscribed_message,
@@ -57,6 +58,11 @@ class NS_Widget_MailChimp extends WP_Widget {
 						<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
 					</p>
 					<p>
+						<label for="<?php echo $this->get_field_id('description'); ?>"><?php echo __('Description :', 'mailchimp-widget'); ?></label>
+						<textarea class="widefat" id="<?php echo $this->get_field_id('description'); ?>" name="<?php echo $this->get_field_name('description'); ?>"><?php echo $description; ?></textarea>
+					</p>
+
+					<p>
 						<label for="<?php echo $this->get_field_id('current_mailing_list'); ?>"><?php echo __('Select a Mailing List :', 'mailchimp-widget'); ?></label>
 						<select class="widefat" id="<?php echo $this->get_field_id('current_mailing_list');?>" name="<?php echo $this->get_field_name('current_mailing_list'); ?>">
 			<?php	
@@ -69,7 +75,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 			?>
 						</select>
 					</p>
-					<p><strong>N.B.</strong><?php echo  __('This is the list your users will be signing up for in your sidebar.', 'mailchimp-widget'); ?></p>
+					<p><?php echo  __('This is the list your users will be signing up for in your sidebar.', 'mailchimp-widget'); ?></p>
 					<p>
 						<label for="<?php echo $this->get_field_id('signup_text'); ?>"><?php echo __('Sign Up Button Text :', 'mailchimp-widget'); ?></label>
 						<input class="widefat" id="<?php echo $this->get_field_id('signup_text'); ?>" name="<?php echo $this->get_field_name('signup_text'); ?>" value="<?php echo $signup_text; ?>" />
@@ -237,6 +243,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$instance['success_message'] = esc_attr($new_instance['success_message']);
 		$instance['already_subscribed_message'] = esc_attr($new_instance['already_subscribed_message']);
 		$instance['title'] = esc_attr($new_instance['title']);
+		$instance['description'] = esc_attr($new_instance['description']);
 		$instance['group_name'] = esc_attr($new_instance['group_name']);
 		$instance['group_subscriptions'] = esc_attr($new_instance['group_subscriptions']);
 
@@ -268,6 +275,11 @@ class NS_Widget_MailChimp extends WP_Widget {
 
 			echo $after_widget;
 		}
+	}
+
+	public function get_option($key) {
+		$options = get_option($this->option_name);
+		return $options[$this->number][$key];
 	}
 	
 	private function hash_mailing_list_id () {
@@ -302,10 +314,9 @@ class NS_Widget_MailChimp extends WP_Widget {
 	}
 
 	private function get_group_name($number = null) {
-	    $options = get_option($this->option_name);
-	    return $options[$number]['group_name'];
+	  $options = get_option($this->option_name);
+	 	return $options[$number]['group_name'];
 	}
-	
 }
 
 ?>
