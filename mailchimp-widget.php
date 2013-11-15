@@ -31,7 +31,7 @@ if (!defined( 'ABSPATH' )) exit;
 define('MAILCHIMP_WIDGET_PATH', plugin_dir_path( __FILE__ ));
 define('MAILCHIMP_PLUGIN_URL', plugin_dir_url(  __FILE__  ) );
 
-
+require_once MAILCHIMP_WIDGET_PATH.'lib/mc_shortcodes.php';
 require_once MAILCHIMP_WIDGET_PATH.'lib/mcapi.class.php';
 require_once MAILCHIMP_WIDGET_PATH.'lib/ns_mc_plugin.class.php';
 require_once MAILCHIMP_WIDGET_PATH.'lib/ns_widget_mailchimp.class.php';
