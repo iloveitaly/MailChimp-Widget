@@ -1,9 +1,6 @@
 <?php
-$form_id = $this->id_base . '_form-' . $this->number;
-
-$description = $this->get_option('description');
 if(!empty($description)) {
-	echo "<p>".$this->get_option('description')."</p>";
+	echo "<p>".$description."</p>";
 }
 ?>
 <form action="<?php echo $_SERVER['REQUEST_URI']; ?>" id="<?php echo $form_id; ?>" method="post">
@@ -17,7 +14,7 @@ if(!empty($description)) {
 	</div>
 	<?php endif; ?>
 
-	<?php if ($instance['collect_last']): ?>
+	<?php if($instance['collect_last']): ?>
 	<div class="form-group">
 		<input class='form-control' placeholder="Last Name" type="text" name="<?php echo $this->id_base . '_last_name'; ?>" />
 	</div>
@@ -29,8 +26,10 @@ if(!empty($description)) {
 	</div>
 
 	<input class="btn btn-success" type="submit" name="<?php echo __($instance['signup_text'], 'mailchimp-widget'); ?>" value="<?php echo __($instance['signup_text'], 'mailchimp-widget'); ?>" />
+	<?php if(!empty($learn_more)): ?><a href="<?php echo $learn_more; ?>" class='btn btn-primary'>Learn More</a><?php endif; ?>
 </form>
-<script>jQuery('#<?php echo $form_id; ?>').ns_mc_widget({
+<script>
+jQuery('#<?php echo $form_id; ?>').ns_mc_widget({
 	"url":"<?php echo $_SERVER['PHP_SELF']; ?>",
 	"cookie_id" : "<?php echo $this->id_base; ?>-<?php echo $this->number; ?>",
 	"cookie_value" : "<?php echo $this->hash_mailing_list_id(); ?>"

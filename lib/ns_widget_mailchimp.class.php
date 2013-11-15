@@ -10,7 +10,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 	private $subscribe_errors;
 	private $ns_mc_plugin;
 	
-	public function NS_Widget_MailChimp () {
+	public function NS_Widget_MailChimp() {
 		$this->default_failure_message = __('There was a problem processing your submission.');
 		$this->default_signup_text = __('Join now!');
 		$this->default_success_message = __('Thank you for joining our mailing list. Please check your email for a confirmation link.');
@@ -119,7 +119,10 @@ class NS_Widget_MailChimp extends WP_Widget {
 						<label for="<?php echo $this->get_field_id('group_subscriptions'); ?>">Group Subscriptions</label>
 						<textarea class="widefat" id="<?php echo $this->get_field_id('group_subscriptions'); ?>" name="<?php echo $this->get_field_name('group_subscriptions'); ?>"><?php echo $group_subscriptions; ?></textarea>
 					</p>
-					<?php if(isset($current_mailing_list)) {
+					<?php
+
+					if(isset($current_mailing_list)) {
+						echo "<h3>Groups</h3>";
 						$group_listing = $mcapi->listInterestGroupings($current_mailing_list);
 
 						foreach($group_listing as $key => $group_info) {
@@ -127,13 +130,23 @@ class NS_Widget_MailChimp extends WP_Widget {
 							foreach($group_info["groups"] as $group_interests_info) {
 								echo $group_interests_info["name"]."<br/>";
 							}
+							echo "<br/>";
 						}
+					}
+
+					if(isset($this->number)) {
+						echo "<h3>Shortcode</h3>";
+						echo "<code>[mc-widget id=\"{$this->number}\" learn_more=\"/the-path\"]</code><br/><br/>";
 					}
 		}
 	}
 	
 	public function process_submission() {
 		$merge_vars = array();
+
+		if(!empty($_REQUEST['ns_mc_number'])) {
+			$this->_set(intval($_REQUEST['ns_mc_number']));
+		}
 
 		// handle optional first & last names
 
@@ -254,29 +267,32 @@ class NS_Widget_MailChimp extends WP_Widget {
 	
 	public function widget($args, $instance) {
 		extract($args);
-		
-		if ($this->ns_mc_plugin->get_mcapi() == false) {
+
+		// we optionally define these for the shortcode
+		if(!isset($form_id)) $form_id = $this->id_base . '_form-' . $this->number;
+		if(!isset($description)) $description = $instance['description'];
+		if(!isset($title)) $title = $instance['title'];
+
+		if($this->ns_mc_plugin->get_mcapi() == false) {
 			return 0;
-		} else {
-			echo $before_widget;
-
-			if(!empty($instance['title'])) {
-				echo $before_title . $instance['title'] . $after_title;
-			}
-			
-			if ($this->successful_signup) {
-				echo $this->signup_success_message;
-			} else {
-				// allow the user to customize the template without forking the plugin
-				if($overridden_template = locate_template( 'templates/mc-widget.php')) {
-					include $overridden_template;
-				} else {
-					include MAILCHIMP_WIDGET_PATH . 'templates/widget_template.php';
-				}
-			}
-
-			echo $after_widget;
 		}
+
+		echo $before_widget;
+
+		if(!empty($title)) echo $before_title . $title . $after_title;
+		
+		if($this->successful_signup) {
+			echo $this->signup_success_message;
+		} else {
+			// allow the user to customize the template without forking the plugin
+			if($overridden_template = locate_template( 'templates/mc-widget.php')) {
+				include $overridden_template;
+			} else {
+				include MAILCHIMP_WIDGET_PATH . 'templates/widget_template.php';
+			}
+		}
+
+		echo $after_widget;
 	}
 
 	public function get_option($key) {
