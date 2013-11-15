@@ -11,23 +11,29 @@ class NS_MC_Plugin {
 	private function __construct () {
 		self::load_text_domain();
 		register_activation_hook(__FILE__, array(&$this, 'set_up_options'));
-		 // Set up the settings.
+
+		// Set up the settings.
 		add_action('admin_init', array(&$this, 'register_settings'));
-		 // Set up the administration page.
+
+		// Set up the administration page.
 		add_action('admin_menu', array(&$this, 'set_up_admin_page'));
-		 // Fetch the options, and, if they haven't been set up yet, display a notice to the user.
+
+		// Fetch the options, and, if they haven't been set up yet, display a notice to the user.
 		$this->get_options();
-		if ($this->options == '') {
+		if($this->options == '') {
 			add_action('admin_notices', array(&$this, 'admin_notices'));
 		}
-		 // Add our widget when widgets get intialized.
+
+		// Add our widget when widgets get intialized
+		// TODO not sure why create_function is being used here; something to cleanup in the future
 		add_action('widgets_init', create_function('', 'return register_widget("NS_Widget_MailChimp");'));
 	}
 
 	public static function get_instance () {
-		if (empty(self::$instance)) {
+		if(empty(self::$instance)) {
 			self::$instance = new self::$name;
 		}
+
 		return self::$instance;
 	}
 	
@@ -37,7 +43,12 @@ class NS_MC_Plugin {
 
 	public function admin_page () {
 		global $blog_id;	
-		$api_key = (is_array($this->options)) ? $this->options['api-key'] : '';
+
+		$api_key = $this->get_api_key();
+		if($api_key === false) {
+			$api_key = '';
+		}
+
 		if (isset($_POST[self::$prefix . '_nonce'])) {
 			$nonce = $_POST[self::$prefix . '_nonce'];
 			$nonce_key = self::$prefix . '_update_options';
@@ -142,15 +153,15 @@ class NS_MC_Plugin {
 		return $api_key;
 	}
 	
-	private function get_api_key () {
-		if (is_array($this->options) && ! empty($this->options['api-key'])) {
+	private function get_api_key() {
+		if (is_array($this->options) && !empty($this->options['api-key'])) {
 			return $this->options['api-key'];
 		} else {
 			return false;
 		}
 	}
 	
-	private function update_options ($options_values) {
+	private function update_options($options_values) {
 		$old_options_values = get_option(self::$prefix . '_options');
 		$new_options_values = wp_parse_args($options_values, $old_options_values);
 		update_option(self::$prefix .'_options', $new_options_values);

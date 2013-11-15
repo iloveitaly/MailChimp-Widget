@@ -2,6 +2,7 @@
 
 class NS_Widget_MailChimp extends WP_Widget {
 	private $default_failure_message;
+	// TODO remove once we use a better loader library
 	private $default_loader_graphic = '/wp-content/plugins/mailchimp-widget/images/ajax-loader.gif';
 	private $default_signup_text;
 	private $default_success_message;
@@ -17,9 +18,12 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$this->default_success_message = __('Thank you for joining our mailing list. Please check your email for a confirmation link.');
 		$this->default_already_subscribed_message = __("You are already subscribed. Thank you for joining our list!");
 		$this->default_title = __('Sign up for our mailing list.');
+
 		$widget_options = array('classname' => 'widget_ns_mailchimp', 'description' => __( "Displays a sign-up form for a MailChimp mailing list.", 'mailchimp-widget'));
 		$this->WP_Widget('ns_widget_mailchimp', __('MailChimp List Signup', 'mailchimp-widget'), $widget_options);
 		$this->ns_mc_plugin = NS_MC_Plugin::get_instance();
+
+		// TODO remove once we use a better loader library
 		$this->default_loader_graphic = get_bloginfo('wpurl') . $this->default_loader_graphic;
 
 		add_action('init', array(&$this, 'add_scripts'));
@@ -32,6 +36,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 	
 	public function form($instance) {
 		$mcapi = $this->ns_mc_plugin->get_mcapi();
+
 		if ($mcapi == false) {
 			echo $this->ns_mc_plugin->get_admin_notices();
 		} else {
@@ -49,8 +54,12 @@ class NS_Widget_MailChimp extends WP_Widget {
 				'collect_last' => false,
 				'old_markup' => false
 			);
+
+			// TODO: don't like extract; too much magic, manually define variables in the future
 			$vars = wp_parse_args($instance, $defaults);
 			extract($vars);
+
+			// TODO this should all be in a template; I really don't like the WP convention of miking plugin logic + HTML together
 			?>
 					<h3><?php echo  __('General Settings', 'mailchimp-widget'); ?></h3>
 					<p>
@@ -169,7 +178,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				if($this->ns_mc_plugin == false) {
 					$response = json_encode($result);
 				} else {
-					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_GET['ns_mc_number']), $_GET[$this->id_base . '_email'], $merge_vars);
+					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_option('current_mailing_list'), $_GET[$this->id_base . '_email'], $merge_vars);
 				
 					if ($subscribed == false) {
 						$result['mc_errorcode'] = $mcapi->errorCode;
@@ -204,7 +213,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				return false;
 			}
 			
-			$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_current_mailing_list_id($_POST['ns_mc_number']), $_POST[$this->id_base . '_email'], $merge_vars);
+			$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_option('current_mailing_list'), $_POST[$this->id_base . '_email'], $merge_vars);
 			
 			if ($subscribed == false) {
 				return false;
@@ -280,11 +289,6 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$options = get_option($this->option_name);
 		$hash = md5($options[$this->number]['current_mailing_list']);
 		return $hash;
-	}
-	
-	private function get_current_mailing_list_id ($number = null) {
-		$options = get_option($this->option_name);
-		return $options[$number]['current_mailing_list'];
 	}
 }
 
