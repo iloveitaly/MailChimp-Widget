@@ -2,8 +2,6 @@
 
 class NS_Widget_MailChimp extends WP_Widget {
 	private $default_failure_message;
-	// TODO remove once we use a better loader library
-	private $default_loader_graphic = '/wp-content/plugins/mailchimp-widget/images/ajax-loader.gif';
 	private $default_signup_text;
 	private $default_success_message;
 	private $default_already_subscribed_message;
@@ -23,15 +21,16 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$this->WP_Widget('ns_widget_mailchimp', __('MailChimp List Signup', 'mailchimp-widget'), $widget_options);
 		$this->ns_mc_plugin = NS_MC_Plugin::get_instance();
 
-		// TODO remove once we use a better loader library
-		$this->default_loader_graphic = get_bloginfo('wpurl') . $this->default_loader_graphic;
-
 		add_action('init', array(&$this, 'add_scripts'));
 		add_action('parse_request', array(&$this, 'process_submission'));
 	}
 	
-	public function add_scripts () {
-		wp_enqueue_script('ns-mc-widget', plugins_url('js/mailchimp-widget-min.js', dirname(__FILE__)), array('jquery'), false);
+	public function add_scripts() {
+		wp_enqueue_style('ns-mc-widget', MAILCHIMP_PLUGIN_URL . 'bower_components/jquery.loadmask.spin/jquery.loadmask.spin.css' );
+
+		wp_enqueue_script('ns-mc-widget-spin', MAILCHIMP_PLUGIN_URL . 'bower_components/spin.js/dist/spin.min.js', array('jquery'), false);
+		wp_enqueue_script('ns-mc-widget-loadmask', MAILCHIMP_PLUGIN_URL . 'bower_components/jquery.loadmask.spin/jquery.loadmask.spin.js', array('jquery', 'ns-mc-widget-spin'), false);
+		wp_enqueue_script('ns-mc-widget', MAILCHIMP_PLUGIN_URL . 'js/mailchimp-widget.js', array('jquery'), false);
 	}
 	
 	public function form($instance) {

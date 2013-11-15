@@ -33,7 +33,6 @@ if(!empty($description)) {
 <script>jQuery('#<?php echo $form_id; ?>').ns_mc_widget({
 	"url":"<?php echo $_SERVER['PHP_SELF']; ?>",
 	"cookie_id" : "<?php echo $this->id_base; ?>-<?php echo $this->number; ?>",
-	"cookie_value" : "<?php echo $this->hash_mailing_list_id(); ?>",
-	"loader_graphic" : "<?php echo $this->default_loader_graphic; ?>"
+	"cookie_value" : "<?php echo $this->hash_mailing_list_id(); ?>"
 });
 </script>

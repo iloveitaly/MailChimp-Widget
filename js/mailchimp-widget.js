@@ -13,29 +13,11 @@
 		opts = jQuery.extend(defaults, options);
 		eL = $(this);
 		eL.submit(function () {
-			
-			var ajax_loader;
-			ajax_loader = jQuery('<div></div>');
-			ajax_loader.css({
-				'background-image' : 'url(' + opts.loader_graphic + ')',
-				'background-position' : 'center center',
-				'background-repeat' : 'no-repeat',
-				'height' : '100%',
-				'left' : '0',
-				'position' : 'absolute',
-				'top' : '0',
-				'width' : '100%',
-				'z-index' : '100'				
-			});
-			
-			eL.css({
-				'height' : '100%',
-				'position' : 'relative',
-				'width' : '100%'
-			});
-			
-			eL.children().hide();
-			eL.append(ajax_loader);
+
+			eL.mask({
+				label:"Loading...",
+				overlayOpacity: 0.25
+			})
 			
 			$.getJSON(opts.url, eL.serialize(), function (data, textStatus) {
 				var cookie_date, error_container, new_content;
@@ -57,13 +39,12 @@
 						}
 					} else {
 						error_container = jQuery('.error', eL);
+						eL.unmask();
 						if (0 === error_container.length) {
-							ajax_loader.remove();
 							eL.children().show();
 							error_container = jQuery('<div class="error"></div>');
 							error_container.prependTo(eL);
 						} else {
-							ajax_loader.remove();
 							eL.children().show();
 						}
 						error_container.html(data.error);
