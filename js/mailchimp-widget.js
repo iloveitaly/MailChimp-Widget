@@ -1,57 +1,55 @@
 //'use strict';
 
-(function ($) {
-	
-	$.fn.ns_mc_widget = function (options) {
-		
-		var defaults, eL, opts;
-		defaults = {
+(function($) {
+	$.fn.ns_mc_widget = function(options) {
+		var eL, opts;
+
+		opts = jQuery.extend({
 			'url' : '/',
 			'cookie_id' : false,
 			'cookie_value' : ''
-		};
-		opts = jQuery.extend(defaults, options);
+		}, options);
+
 		eL = $(this);
-		eL.submit(function () {
+		eL.submit(function() {
 
 			eL.mask({
 				label:"Loading...",
 				overlayOpacity: 0.25
 			})
 			
-			$.getJSON(opts.url, eL.serialize(), function (data, textStatus) {
+			$.getJSON(opts.url, eL.serialize(), function(data, textStatus) {
 				var cookie_date, error_container, new_content;
-				if ('success' === textStatus) {
-					if (true === data.success) {
+				eL.unmask();
+
+				if (textStatus === 'success') {
+					if(data.success === true) {
 						new_content = jQuery('<p>' + data.success_message + '</p>');
-						new_content.hide();
-						eL.fadeTo(400, 0, function () {
-							eL.html(new_content);
-							new_content.show();
-							eL.fadeTo(400, 1);
-							
-						});
+						eL.html(new_content);
 						
-						if (false !== opts.cookie_id) {
+						if(opts.cookie_id !== false) {
 							cookie_date = new Date();
 							cookie_date.setTime(cookie_date.getTime() + '3153600000');
 							document.cookie = opts.cookie_id + '=' + opts.cookie_value + '; expires=' + cookie_date.toGMTString() + ';';
 						}
 					} else {
 						error_container = jQuery('.error', eL);
-						eL.unmask();
-						if (0 === error_container.length) {
+
+						if(error_container.length === 0) {
 							eL.children().show();
 							error_container = jQuery('<div class="error"></div>');
 							error_container.prependTo(eL);
 						} else {
 							eL.children().show();
 						}
+
 						error_container.html(data.error);
 					}
 				}
+
 				return false;
 			});
+
 			return false;
 		});
 	};
