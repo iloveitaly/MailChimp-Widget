@@ -270,7 +270,9 @@ class NS_Widget_MailChimp extends WP_Widget {
 
 		// we optionally define these for the shortcode
 		if(!isset($form_id)) $form_id = $this->id_base . '_form-' . $this->number;
-		if(!isset($description)) $description = $instance['description'];
+
+		// TODO for some reason $description is passed in the args; this wil break setting description empty via shortcode
+		if(empty($description)) $description = $instance['description'];
 		if(!isset($title)) $title = $instance['title'];
 
 		if($this->ns_mc_plugin->get_mcapi() == false) {
@@ -285,7 +287,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 			echo $this->signup_success_message;
 		} else {
 			// allow the user to customize the template without forking the plugin
-			if($overridden_template = locate_template( 'templates/mc-widget.php')) {
+			if($overridden_template = locate_template('templates/mc-widget.php')) {
 				include $overridden_template;
 			} else {
 				include MAILCHIMP_WIDGET_PATH . 'templates/widget_template.php';

@@ -7,6 +7,7 @@ function mc_register_shortcodes(){
 
 function mc_shortcode_widget($atts) {
 	// http://digwp.com/2010/04/call-widget-with-shortcode/
+	// http://wp.smashingmagazine.com/2012/05/01/wordpress-shortcodes-complete-guide/
 
 	$widget_id = $atts['id'];
 
