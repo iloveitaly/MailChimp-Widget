@@ -1,5 +1,5 @@
 <?php
-if(!empty($description)) {
+if(!empty($description) && trim($description) != '') {
 	echo "<p>".$description."</p>";
 }
 ?>
