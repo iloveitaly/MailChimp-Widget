@@ -37,7 +37,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 		$mcapi = $this->ns_mc_plugin->get_mcapi();
 
 		if ($mcapi == false) {
-			echo $this->ns_mc_plugin->get_admin_notices();
+			// TODO MC API failed to connect, need to throw a admin-user visible error
 		} else {
 			$this->lists = $mcapi->lists();
 			$defaults = array(
@@ -136,7 +136,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 
 					if(isset($this->number)) {
 						echo "<h3>Shortcode</h3>";
-						echo "<code>[mc-widget id=\"{$this->number}\" learn_more=\"/the-path\"]</code><br/><br/>";
+						echo "<code>[mc-widget id=\"{$this->number}\" description=\"custom description\" learn_more=\"/the-path\"]</code><br/><br/>";
 					}
 		}
 	}
@@ -160,6 +160,11 @@ class NS_Widget_MailChimp extends WP_Widget {
 
 		// handle group subscriptions
 
+		// TODO the GROUPINGS[0] syntax here isn't right; needs to be cleaned up to support
+		// 			widget specified groups and form specified groups at the same time
+
+		// set GROUPINGS merge var based on widget settings
+
 		$group_subscriptions = $this->get_option('group_subscriptions');
 		$group_name = $this->get_option('group_name');
 
@@ -171,6 +176,22 @@ class NS_Widget_MailChimp extends WP_Widget {
 				)
 			);
 		}
+
+		// set GROUPINGS merge var based on form input
+
+		$group_subscription = @$_REQUEST[$this->id_base . '_group_subscription'];
+		$group_name = @$_REQUEST[$this->id_base . '_group_name'];
+
+		if(!empty($group_subscription) && !empty($group_name)) {
+			$merge_vars['GROUPINGS'] = array(
+				"0" => array(
+					'name' => $group_name,
+					'groups' => $group_subscription
+				)
+			);
+		}
+
+		// push subscription request to mailchimp
 
 		if (isset($_GET[$this->id_base . '_email'])) {
 			header("Content-Type: application/json");
@@ -190,6 +211,7 @@ class NS_Widget_MailChimp extends WP_Widget {
 				if($this->ns_mc_plugin == false) {
 					$response = json_encode($result);
 				} else {
+					// TODO this is a custom method; need to extract from MC API class to prevent future breakage
 					$subscribed = $mcapi->listSubscribeOrListUpdateMember($this->get_option('current_mailing_list'), $_GET[$this->id_base . '_email'], $merge_vars);
 				
 					if ($subscribed == false) {
