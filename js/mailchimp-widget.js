@@ -24,7 +24,7 @@
 
 				if (textStatus === 'success') {
 					if(data.success === true) {
-						new_content = jQuery('<p>' + data.success_message + '</p>');
+						new_content = jQuery('<p class="alert alert-success">' + data.success_message + '</p>');
 						eL.html(new_content);
 						
 						if(opts.cookie_id !== false) {
@@ -37,7 +37,7 @@
 
 						if(error_container.length === 0) {
 							eL.children().show();
-							error_container = jQuery('<div class="error"></div>');
+							error_container = jQuery('<div class="alert alert-danger"></div>');
 							error_container.prependTo(eL);
 						} else {
 							eL.children().show();
