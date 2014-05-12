@@ -36,5 +36,5 @@ require_once MAILCHIMP_WIDGET_PATH.'lib/mcapi.class.php';
 require_once MAILCHIMP_WIDGET_PATH.'lib/ns_mc_plugin.class.php';
 require_once MAILCHIMP_WIDGET_PATH.'lib/ns_widget_mailchimp.class.php';
 
-$ns_mc_plugin = NS_MC_Plugin::get_instance();
+$mc_plugin = NS_MC_Plugin::get_instance();
 ?>
