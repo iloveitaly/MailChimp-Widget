@@ -2,7 +2,7 @@
 
 (function($) {
 	$.fn.ns_mc_widget = function(options) {
-		var eL, opts;
+		var target_form, opts;
 
 		opts = jQuery.extend({
 			'url' : '/',
@@ -10,22 +10,23 @@
 			'cookie_value' : ''
 		}, options);
 
-		eL = $(this);
-		eL.submit(function() {
+		target_form = $(this);
+		target_form.submit(function() {
 
-			eL.mask({
-				label:"Loading...",
+			target_form.mask({
+				label: "Loading...",
 				overlayOpacity: 0.25
 			})
 			
-			$.getJSON(opts.url, eL.serialize(), function(data, textStatus) {
+			$.getJSON(opts.url, target_form.serialize(), function(data, textStatus) {
 				var cookie_date, error_container, new_content;
-				eL.unmask();
+				target_form.unmask();
 
-				if (textStatus === 'success') {
+				if(textStatus === 'success') {
+
 					if(data.success === true) {
 						new_content = jQuery('<p class="alert alert-success">' + data.success_message + '</p>');
-						eL.html(new_content);
+						target_form.html(new_content);
 						
 						if(opts.cookie_id !== false) {
 							cookie_date = new Date();
@@ -33,14 +34,14 @@
 							document.cookie = opts.cookie_id + '=' + opts.cookie_value + '; expires=' + cookie_date.toGMTString() + ';';
 						}
 					} else {
-						error_container = jQuery('.error', eL);
+						error_container = jQuery('.error', target_form);
 
 						if(error_container.length === 0) {
-							eL.children().show();
+							target_form.children().show();
 							error_container = jQuery('<div class="alert alert-danger"></div>');
-							error_container.prependTo(eL);
+							error_container.prependTo(target_form);
 						} else {
-							eL.children().show();
+							target_form.children().show();
 						}
 
 						error_container.html(data.error);
