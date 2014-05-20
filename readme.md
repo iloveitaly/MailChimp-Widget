@@ -22,6 +22,18 @@ Here is a high level overview of the features:
   * collect_last
   * collect_first
 
+You can also setup custom forms. The `js-mailchimp-form` class will notify the JS library to hook into the `submit` event on the form.
+
+```html
+<form action="/blog/" class='js-mailchimp-form' method="post">
+  <input type="hidden" name="ns_mc_number" value="2">
+  <div class="input-group">
+    <input class="form-control required email" type="email" name="ns_widget_mailchimp_email" placeholder="Email Address" value="" />
+    <span class="input-group-btn"><button class="btn btn-primary" id="mc-embedded-subscribe" name="subscribe" type="submit">Subscribe</button></span>
+  </div>
+</form>
+```
+
 ## TODO
 
 * Use `data` attributes to trigger MC signup on any forms

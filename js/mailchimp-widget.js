@@ -1,11 +1,12 @@
 //'use strict';
 
 (function($) {
-	$.fn.ns_mc_widget = function(options) {
+	$.fn.mailchimp_widget = function(options) {
 		var target_form, opts;
+		options = options || {}
 
 		opts = jQuery.extend({
-			'url' : '/',
+			'url' : '/index.php',
 			'cookie_id' : false,
 			'cookie_value' : ''
 		}, options);
@@ -55,3 +56,7 @@
 		});
 	};
 }(jQuery));
+
+$(function() {
+  $('form.js-mailchimp-form').mailchimp_widget({});
+});

@@ -29,7 +29,7 @@ if(!empty($description) && trim($description) != '') {
 	<?php if(!empty($learn_more)): ?><a href="<?php echo $learn_more; ?>" class='btn btn-primary'>Learn More</a><?php endif; ?>
 </form>
 <script>
-jQuery('#<?php echo $form_id; ?>').ns_mc_widget({
+jQuery('#<?php echo $form_id; ?>').mailchimp_widget({
 	"url":"<?php echo $_SERVER['PHP_SELF']; ?>",
 	"cookie_id" : "<?php echo $this->id_base; ?>-<?php echo $this->number; ?>",
 	"cookie_value" : "<?php echo $this->hash_mailing_list_id(); ?>"
