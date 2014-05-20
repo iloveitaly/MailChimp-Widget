@@ -45,7 +45,7 @@ class NS_MC_Plugin {
 
 		// TODO this is messy; I bet there is a WP API to link to the options page
 		echo '<div class="error fade"><p>' .
-				 __('You\'ll need to set up the MailChimp signup widget plugin options before using it. ', 'mailchimp-widget') . __('You can make your changes', 'mailchimp-widget') . ' <a href="' . get_admin_url($blog_id) . 'options-general.php?page=mailchimp-widget/lib/ns_mc_plugin.class.php">' . __('here', 'mailchimp-widget') . '.</a>' .
+				 __('You\'ll need to set up the MailChimp signup widget plugin options before using it. ', 'mailchimp-widget') . __('You can make your changes', 'mailchimp-widget') . ' <a href="' . get_admin_url($blog_id) . 'options-general.php?page=wordpress-mailchimp-widget/lib/ns_mc_plugin.class.php">' . __('here', 'mailchimp-widget') . '.</a>' .
 				 '</p></div>';
 	}
 
